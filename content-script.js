@@ -30,23 +30,30 @@ function drawTooltipNearSelection(text) {
 		div.style.position = "absolute";
 		div.style.backgroundColor = "#898A95";
 		div.style.color = "#fff";
-		div.style.padding = "5px";
+		div.style.height = "32px";
+		div.style.width = "45px";
 		div.style.borderRadius = "5px";
 		div.style.cursor = "pointer";
+		div.style.display = "flex";
+		div.style.justifyContent = "center";
+		div.style.alignItems = "center";
+		div.style.zIndex = "9999";
 
-		const yPos = rect.top + window.scrollY - 30;
+		const compStyles = window.getComputedStyle(selection.anchorNode.parentNode);
+		const parentLineHeight = parseFloat(
+			compStyles.getPropertyValue("line-height")
+		);
+		// WHY DOES THIS WORK SO WELL?
+		const yPos =
+			rect.top +
+			window.scrollY -
+			parentLineHeight / 2 -
+			parseInt(div.style.height) / 2 -
+			10;
 		div.style.top = yPos + "px";
 
-		const xPos = rect.right - 25;
+		const xPos = rect.right - parseInt(div.style.width, 10);
 		div.style.left = xPos + "px";
-
-		console.log(selection.anchorNode.parentNode);
-		console.log({ rect });
-		console.log({
-			x: window.scrollX,
-			y: window.scrollY,
-			sum: yPos,
-		});
 
 		div.addEventListener("click", (e) => {
 			console.log("clicked", { target: e.target });
