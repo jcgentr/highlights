@@ -60,9 +60,13 @@ function drawTooltipNearSelection(text) {
 		div.addEventListener("click", (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			chrome.storage.sync.set({
-				highlights: [{ note: text }],
+			chrome.storage.sync.get("highlights", (data) => {
+				console.log("highlights: ", data.highlights);
+				chrome.storage.sync.set({
+					highlights: [...data.highlights, { note: text }],
+				});
 			});
+
 			div.parentNode.removeChild(div);
 			div = null;
 		});
@@ -75,20 +79,15 @@ document.addEventListener("mouseup", (e) => {
 	e.stopPropagation();
 	if (window.getSelection().toString().length) {
 		mouseMoved = true;
-		console.log(window.getSelection());
 		let exactText = window.getSelection().toString();
-		console.log({ exactText });
 		drawTooltipNearSelection(exactText);
 	}
 });
 
 document.addEventListener("click", (e) => {
-	console.log("click event", e);
 	if (div && !mouseMoved) {
-		console.log("removing div...");
 		div.parentNode.removeChild(div);
 		div = null;
 	}
-	console.log("setting mouseMoved to false...");
 	mouseMoved = false;
 });
