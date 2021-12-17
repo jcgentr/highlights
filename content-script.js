@@ -14,6 +14,7 @@ function setHighlightColor() {
 setHighlightColor();
 
 let div = null;
+let mouseMoved = false;
 
 function drawTooltipNearSelection(text) {
 	const selection = window.getSelection(), // get the selection then
@@ -23,6 +24,7 @@ function drawTooltipNearSelection(text) {
 	if (rect.width > 0) {
 		if (div) {
 			div.parentNode.removeChild(div);
+			div = null;
 		}
 		div = document.createElement("div");
 		div.innerHTML = "<strong>Add</strong>";
@@ -56,8 +58,8 @@ function drawTooltipNearSelection(text) {
 		div.style.left = xPos + "px";
 
 		div.addEventListener("click", (e) => {
-			console.log("clicked", { target: e.target });
-			console.log("setting to:", text);
+			e.preventDefault();
+			e.stopPropagation();
 			chrome.storage.sync.set({
 				highlights: [{ note: text }],
 			});
@@ -68,11 +70,25 @@ function drawTooltipNearSelection(text) {
 	}
 }
 
-document.addEventListener("mouseup", (event) => {
+document.addEventListener("mouseup", (e) => {
+	e.preventDefault();
+	e.stopPropagation();
 	if (window.getSelection().toString().length) {
+		mouseMoved = true;
 		console.log(window.getSelection());
 		let exactText = window.getSelection().toString();
 		console.log({ exactText });
 		drawTooltipNearSelection(exactText);
 	}
+});
+
+document.addEventListener("click", (e) => {
+	console.log("click event", e);
+	if (div && !mouseMoved) {
+		console.log("removing div...");
+		div.parentNode.removeChild(div);
+		div = null;
+	}
+	console.log("setting mouseMoved to false...");
+	mouseMoved = false;
 });
