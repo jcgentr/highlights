@@ -13,34 +13,44 @@ function setHighlightColor() {
 
 setHighlightColor();
 
-let div = null;
+let text = "";
+
+let toolTip = document.createElement("div");
+toolTip.innerHTML = "<strong>Add</strong>";
+toolTip.class = "rect";
+toolTip.style.position = "absolute";
+toolTip.style.backgroundColor = "#898A95";
+toolTip.style.color = "#fff";
+toolTip.style.height = "32px";
+toolTip.style.width = "45px";
+toolTip.style.borderRadius = "5px";
+toolTip.style.cursor = "pointer";
+toolTip.style.display = "flex";
+toolTip.style.justifyContent = "center";
+toolTip.style.alignItems = "center";
+toolTip.style.zIndex = "9999";
+toolTip.addEventListener("click", (e) => {
+	e.preventDefault();
+	e.stopPropagation();
+	chrome.storage.sync.get("highlights", (data) => {
+		console.log("highlights: ", data.highlights);
+		chrome.storage.sync.set({
+			highlights: [...data.highlights, { note: text }],
+		});
+	});
+	toolTip.style.display = "none";
+});
+toolTip.style.display = "none";
+document.body.appendChild(toolTip);
+
 let mouseMoved = false;
 
-function drawTooltipNearSelection(text) {
+function drawTooltipNearSelection() {
 	const selection = window.getSelection(), // get the selection then
 		range = selection.getRangeAt(0), // the range at first selection group
 		rect = range.getBoundingClientRect(); // and convert this to useful data
 
 	if (rect.width > 0) {
-		if (div) {
-			div.parentNode.removeChild(div);
-			div = null;
-		}
-		div = document.createElement("div");
-		div.innerHTML = "<strong>Add</strong>";
-		div.class = "rect";
-		div.style.position = "absolute";
-		div.style.backgroundColor = "#898A95";
-		div.style.color = "#fff";
-		div.style.height = "32px";
-		div.style.width = "45px";
-		div.style.borderRadius = "5px";
-		div.style.cursor = "pointer";
-		div.style.display = "flex";
-		div.style.justifyContent = "center";
-		div.style.alignItems = "center";
-		div.style.zIndex = "9999";
-
 		const compStyles = window.getComputedStyle(selection.anchorNode.parentNode);
 		const parentLineHeight = parseFloat(
 			compStyles.getPropertyValue("line-height")
@@ -50,27 +60,13 @@ function drawTooltipNearSelection(text) {
 			rect.top +
 			window.scrollY -
 			parentLineHeight / 2 -
-			parseInt(div.style.height) / 2 -
+			parseInt(toolTip.style.height) / 2 -
 			10;
-		div.style.top = yPos + "px";
+		toolTip.style.top = yPos + "px";
 
-		const xPos = rect.right - parseInt(div.style.width, 10);
-		div.style.left = xPos + "px";
-
-		div.addEventListener("click", (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			chrome.storage.sync.get("highlights", (data) => {
-				console.log("highlights: ", data.highlights);
-				chrome.storage.sync.set({
-					highlights: [...data.highlights, { note: text }],
-				});
-			});
-
-			div.parentNode.removeChild(div);
-			div = null;
-		});
-		document.body.appendChild(div);
+		const xPos = rect.right - parseInt(toolTip.style.width, 10);
+		toolTip.style.left = xPos + "px";
+		toolTip.style.display = "flex";
 	}
 }
 
@@ -79,15 +75,14 @@ document.addEventListener("mouseup", (e) => {
 	e.stopPropagation();
 	if (window.getSelection().toString().length) {
 		mouseMoved = true;
-		let exactText = window.getSelection().toString();
-		drawTooltipNearSelection(exactText);
+		text = window.getSelection().toString();
+		drawTooltipNearSelection();
 	}
 });
 
 document.addEventListener("click", (e) => {
-	if (div && !mouseMoved) {
-		div.parentNode.removeChild(div);
-		div = null;
+	if (toolTip && !mouseMoved) {
+		toolTip.style.display = "none";
 	}
 	mouseMoved = false;
 });
