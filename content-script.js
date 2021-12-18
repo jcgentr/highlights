@@ -14,6 +14,7 @@ function setHighlightColor() {
 setHighlightColor();
 
 let text = "";
+let baseURI = "";
 
 let toolTip = document.createElement("div");
 toolTip.innerHTML = "<strong>Add</strong>";
@@ -29,26 +30,26 @@ toolTip.style.display = "flex";
 toolTip.style.justifyContent = "center";
 toolTip.style.alignItems = "center";
 toolTip.style.zIndex = "9999";
+// if the toolTip is clicked
 toolTip.addEventListener("click", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
 	chrome.storage.sync.get("highlights", (data) => {
 		console.log("highlights: ", data.highlights);
 		chrome.storage.sync.set({
-			highlights: [...data.highlights, { note: text }],
+			highlights: [...data.highlights, { note: text, href: baseURI }],
 		});
 	});
 	toolTip.style.display = "none";
 });
-toolTip.style.display = "none";
+toolTip.style.display = "none"; // starts off hidden
 document.body.appendChild(toolTip);
 
 let mouseMoved = false;
 
-function drawTooltipNearSelection() {
-	const selection = window.getSelection(), // get the selection then
-		range = selection.getRangeAt(0), // the range at first selection group
-		rect = range.getBoundingClientRect(); // and convert this to useful data
+function drawTooltipNearSelection(selection) {
+	const range = selection.getRangeAt(0); // the range at first selection group
+	const rect = range.getBoundingClientRect(); // and convert this to useful data
 
 	if (rect.width > 0) {
 		const compStyles = window.getComputedStyle(selection.anchorNode.parentNode);
@@ -70,16 +71,25 @@ function drawTooltipNearSelection() {
 	}
 }
 
+// user released mouse button after selecting text
 document.addEventListener("mouseup", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
-	if (window.getSelection().toString().length) {
+	const selection = window.getSelection();
+	const textSelected = selection.toString();
+	if (textSelected.length) {
 		mouseMoved = true;
-		text = window.getSelection().toString();
-		drawTooltipNearSelection();
+		text = textSelected;
+		// TODO: may have to remove any existing jump links (#) in baseURI
+		baseURI =
+			selection.anchorNode.baseURI + `#:~:text=${encodeURIComponent(text)}`;
+		console.log({ selection });
+		console.log({ baseURI });
+		drawTooltipNearSelection(selection);
 	}
 });
 
+// click event captured after mouseup or otherwise
 document.addEventListener("click", (e) => {
 	if (toolTip && !mouseMoved) {
 		toolTip.style.display = "none";

@@ -18,9 +18,14 @@ highlightColorPicker.addEventListener("change", async (event) => {
 let highlightsList = document.getElementById("highlightsList");
 
 chrome.storage.sync.get("highlights", ({ highlights }) => {
-	for (highlight of highlights) {
-		let li = document.createElement("li");
-		li.innerText = highlight.note;
+	for (const highlight of highlights) {
+		const li = document.createElement("li");
+		const a = document.createElement("a");
+		const linkText = document.createTextNode(highlight.note);
+		a.appendChild(linkText);
+		a.href = highlight.href;
+		a.target = "_blank";
+		li.appendChild(a);
 		highlightsList.appendChild(li);
 	}
 });
