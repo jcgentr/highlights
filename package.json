@@ -4,14 +4,14 @@
 	"description": "save highlighted text from web pages",
 	"main": "background.js",
 	"scripts": {
-		"build:dev": "NODE_ENV=\"development\" node esbuild.js",
-		"build:prod": "NODE_ENV=\"production\" node esbuild.js"
+		"build:dev": "tsc && NODE_ENV=\"development\" node esbuild.js",
+		"build:prod": "tsc && NODE_ENV=\"production\" node esbuild.js"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/jcgentr/highlights.git"
 	},
-	"author": "",
+	"author": "Jared Gentry",
 	"license": "ISC",
 	"bugs": {
 		"url": "https://github.com/jcgentr/highlights/issues"

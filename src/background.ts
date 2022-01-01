@@ -6,3 +6,5 @@ chrome.runtime.onInstalled.addListener(() => {
 		highlights: [{ note: "hello world!", href: "http://example.com/" }],
 	});
 });
+
+export {};

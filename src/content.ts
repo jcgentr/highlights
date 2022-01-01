@@ -43,7 +43,7 @@ function drawTooltipNearSelection(selection: Selection) {
 
 	if (rect.width > 0) {
 		const compStyles = window.getComputedStyle(
-			selection.anchorNode.parentElement
+			selection.anchorNode?.parentElement ?? document.body
 		);
 		const parentLineHeight = parseFloat(
 			compStyles.getPropertyValue("line-height")
@@ -68,16 +68,18 @@ document.addEventListener("mouseup", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
 	const selection = window.getSelection();
-	const textSelected = selection.toString();
-	if (textSelected.length) {
-		mouseMoved = true;
-		text = textSelected;
-		// TODO: may have to remove any existing jump links (#) in baseURI
-		baseURI =
-			selection.anchorNode.baseURI + `#:~:text=${encodeURIComponent(text)}`;
-		console.log({ selection });
-		console.log({ baseURI });
-		drawTooltipNearSelection(selection);
+	if (selection) {
+		const textSelected = selection.toString();
+		if (textSelected.length) {
+			mouseMoved = true;
+			text = textSelected;
+			// TODO: may have to remove any existing jump links (#) in baseURI
+			baseURI =
+				selection.anchorNode?.baseURI + `#:~:text=${encodeURIComponent(text)}`;
+			console.log({ selection });
+			console.log({ baseURI });
+			drawTooltipNearSelection(selection);
+		}
 	}
 });
 

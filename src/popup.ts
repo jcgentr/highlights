@@ -42,3 +42,5 @@ chrome.storage.sync.get("highlights", ({ highlights }) => {
 		highlightsList?.appendChild(li);
 	}
 });
+
+export {};
