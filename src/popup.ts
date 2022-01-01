@@ -1,17 +1,30 @@
+function setHighlightColor() {
+	chrome.storage.sync.get("color", ({ color }) => {
+		console.log({ color });
+		if (document) {
+			const styleElem = document.head.appendChild(
+				document.createElement("style")
+			);
+			styleElem.innerHTML = `::selection {background: ${color};}`;
+		}
+	});
+}
+
 let highlightColorPicker = document.getElementById("highlightColor");
 
 chrome.storage.sync.get("color", ({ color }) => {
-	highlightColorPicker.setAttribute("value", color);
+	highlightColorPicker?.setAttribute("value", color);
 });
 
 // When color picker changes, inject setHighlightColor into current page
-highlightColorPicker.addEventListener("change", async (event) => {
+highlightColorPicker?.addEventListener("change", async (event: Event) => {
 	let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-	chrome.storage.sync.set({ color: event.target.value });
+	const input = event.target as HTMLInputElement;
+	chrome.storage.sync.set({ color: input.value });
 
 	chrome.scripting.executeScript({
-		target: { tabId: tab.id },
-		function: setHighlightColor,
+		target: { tabId: tab.id ?? chrome.tabs.TAB_ID_NONE },
+		func: setHighlightColor,
 	});
 });
 
@@ -26,18 +39,6 @@ chrome.storage.sync.get("highlights", ({ highlights }) => {
 		a.href = highlight.href;
 		a.target = "_blank";
 		li.appendChild(a);
-		highlightsList.appendChild(li);
+		highlightsList?.appendChild(li);
 	}
 });
-
-function setHighlightColor() {
-	chrome.storage.sync.get("color", ({ color }) => {
-		console.log({ color });
-		if (document) {
-			const styleElem = document.head.appendChild(
-				document.createElement("style")
-			);
-			styleElem.innerHTML = `::selection {background: ${color};}`;
-		}
-	});
-}

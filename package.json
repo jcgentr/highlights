@@ -1,0 +1,25 @@
+{
+	"name": "highlights",
+	"version": "1.0.0",
+	"description": "save highlighted text from web pages",
+	"main": "background.js",
+	"scripts": {
+		"build:dev": "NODE_ENV=\"development\" node esbuild.js",
+		"build:prod": "NODE_ENV=\"production\" node esbuild.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jcgentr/highlights.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/jcgentr/highlights/issues"
+	},
+	"homepage": "https://github.com/jcgentr/highlights#readme",
+	"devDependencies": {
+		"@types/chrome": "^0.0.174",
+		"esbuild": "^0.14.10",
+		"typescript": "^4.5.4"
+	}
+}

@@ -1,24 +1,14 @@
-let highlightColor;
+import { setHighlightColor } from "./utils/setHighlightColor";
 
-function setHighlightColor() {
-	chrome.storage.sync.get("color", ({ color }) => {
-		console.log({ color });
-		highlightColor = color;
-		const styleElem = document.head.appendChild(
-			document.createElement("style")
-		);
-		styleElem.innerHTML = `::selection {background: ${color};}`;
-	});
-}
-
-setHighlightColor();
+const highlightColor = setHighlightColor();
+console.log({ highlightColor });
 
 let text = "";
 let baseURI = "";
 
 let toolTip = document.createElement("div");
 toolTip.innerHTML = "<strong>Add</strong>";
-toolTip.class = "rect";
+toolTip.className = "rect";
 toolTip.style.position = "absolute";
 toolTip.style.backgroundColor = "#898A95";
 toolTip.style.color = "#fff";
@@ -47,12 +37,14 @@ document.body.appendChild(toolTip);
 
 let mouseMoved = false;
 
-function drawTooltipNearSelection(selection) {
+function drawTooltipNearSelection(selection: Selection) {
 	const range = selection.getRangeAt(0); // the range at first selection group
 	const rect = range.getBoundingClientRect(); // and convert this to useful data
 
 	if (rect.width > 0) {
-		const compStyles = window.getComputedStyle(selection.anchorNode.parentNode);
+		const compStyles = window.getComputedStyle(
+			selection.anchorNode.parentElement
+		);
 		const parentLineHeight = parseFloat(
 			compStyles.getPropertyValue("line-height")
 		);
